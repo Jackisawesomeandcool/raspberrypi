@@ -1,0 +1,330 @@
+<?xml version="1.0"?>
+<!--
+  Candidate URDF v0.6 for Isaac Lab conversion.
+
+  Changes from v0.5:
+  - Move J1 to the mesh-derived Mil_3/Alt_Kapak axis candidate at
+    base_link [9.666, 0, 70] mm.
+  - Move J2 to the confirmed servo-hole axis candidate at
+    J1 [9.5, 0, 50] mm.
+  - Keep Parmak_Disli and Parmak_2 collinear as in the physical assembly.
+  - Recompute the nominal bare-mesh closing pose for that geometry:
+    J6=18.207052 degrees.
+  - Align the midpoint of the two Parmak_2 bend-centre layers with the
+    J5 roll axis; after the child assembly's -8 mm Z placement, place
+    grasp_tcp_link at [93.258628, 0, 0] mm.
+  - Define the real-servo initial posture as URDF q=0 using J1/J2/J3
+    joint-origin rotations about their respective joint axes.
+  - Keep the real-servo travel limits relative to that q=0 posture.
+
+  Confirmed:
+  - Kinematic order and STL/link membership.
+  - STL unit is millimetre; mesh scale is 0.001.
+  - Parmak_2 edge hole is local (0,0); Parmak_Disli edge hole is local
+    (20,0). Both hole axes are local Z.
+  - Wrist A=pitch, Wrist B=roll.
+
+  Candidate values still requiring physical calibration:
+  - Base-to-J1 X placement (9.666 mm).
+  - J2 X placement sign in the final robot-base convention.
+  - Nominal mesh TCP versus the taped physical gripper TCP.
+  - Mass, centre of mass, inertia, effort and velocity.
+  - Gripper passive linkage geometry.
+  Collision geometry intentionally uses primitives for the first Isaac import.
+-->
+<robot name="robotic_arm_v0_6">
+
+  <material name="base_gray"><color rgba="0.28 0.31 0.35 1"/></material>
+  <material name="arm_blue"><color rgba="0.18 0.45 0.72 1"/></material>
+  <material name="wrist_orange"><color rgba="0.86 0.46 0.18 1"/></material>
+
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0 0 0.035" rpy="0 0 0"/>
+      <mass value="2.0"/>
+      <inertia ixx="0.010" ixy="0" ixz="0" iyy="0.010" iyz="0" izz="0.012"/>
+    </inertial>
+    <visual name="alt_kasa_visual">
+      <origin xyz="-0.0849365 -0.1853 -0.035" rpy="0 0 0"/>
+      <geometry><mesh filename="Alt_Kasa.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="base_gray"/>
+    </visual>
+    <visual name="alt_kapak_visual">
+      <origin xyz="-0.170937 -0.06381 0.00325" rpy="0 0 0"/>
+      <geometry><mesh filename="Alt_Kapak.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="base_gray"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.035" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.066" length="0.070"/></geometry>
+    </collision>
+  </link>
+
+  <link name="rotating_base_link">
+    <inertial>
+      <origin xyz="0 0 0.035" rpy="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.0045" ixy="0" ixz="0" iyy="0.0045" iyz="0" izz="0.0060"/>
+    </inertial>
+    <visual name="tabla_alt_visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="Tabla_Alt.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="arm_blue"/>
+    </visual>
+    <visual name="alt_govde_visual">
+      <origin xyz="0 0 0.020" rpy="0 0 0"/>
+      <geometry><mesh filename="Alt_Govde.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="arm_blue"/>
+    </visual>
+    <visual name="mil_3_visual">
+      <origin xyz="0 0 -0.0018" rpy="0 0 0"/>
+      <geometry><mesh filename="Mil_3.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="arm_blue"/>
+    </visual>
+    <visual name="mil_disli_visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="Mil_Disli.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="arm_blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.035" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.060" length="0.070"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="J1_base_yaw" type="revolute">
+    <parent link="base_link"/>
+    <child link="rotating_base_link"/>
+    <!-- Real-servo initial posture defines q=0; offset is about the J1 axis. -->
+    <origin xyz="0.009666 0 0.070" rpy="0 0 3.141592654"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14159" upper="3.14159" effort="20" velocity="1.0"/>
+    <dynamics damping="0.20" friction="0.05"/>
+  </joint>
+
+  <link name="upper_arm_link">
+    <inertial>
+      <origin xyz="0.100000 0 0" rpy="0 0 0"/>
+      <mass value="0.40"/>
+      <inertia ixx="0.00020" ixy="0" ixz="0" iyy="0.00135" iyz="0" izz="0.00135"/>
+    </inertial>
+    <visual name="alt_kol_original_visual">
+      <!--
+        Original STL hole centres (mm): shoulder=(0,0,-100),
+        elbow=(47.5,0,94.278).  The transform first maps their connecting
+        vector onto +X, then rotates the aligned mesh 180 degrees about +X
+        so the physical upper-arm bend points to the opposite side.  Both
+        hole centres stay on the same J2/J3 axis.
+      -->
+      <origin xyz="0.097138768 0 -0.023749943" rpy="3.141592654 -1.331005512 0"/>
+      <geometry><mesh filename="Alt_Kol.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="arm_blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0.100000 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.200000 0.032 0.050"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="J2_shoulder_pitch" type="revolute">
+    <parent link="rotating_base_link"/>
+    <child link="upper_arm_link"/>
+    <!-- Real-servo initial posture defines q=0; offset is about the J2 axis. -->
+    <origin xyz="0.0095 0 0.050" rpy="0 -2.331005512 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-0.6908" upper="0.6908" effort="20" velocity="1.0"/>
+    <dynamics damping="0.25" friction="0.05"/>
+  </joint>
+
+  <link name="forearm_link">
+    <inertial>
+      <origin xyz="0.070 0 0" rpy="0 0 0"/>
+      <mass value="0.30"/>
+      <inertia ixx="0.00010" ixy="0" ixz="0" iyy="0.00055" iyz="0" izz="0.00055"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 3.14159265 0"/>
+      <geometry><mesh filename="On_Kol.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="arm_blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0.070 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.140 0.045 0.040"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="J3_elbow_pitch" type="revolute">
+    <parent link="upper_arm_link"/>
+    <child link="forearm_link"/>
+    <origin xyz="0.200000 0 0" rpy="0 -0.7608 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-0.8892" upper="0.8892" effort="15" velocity="1.2"/>
+    <dynamics damping="0.20" friction="0.04"/>
+  </joint>
+
+  <link name="wrist_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.15"/>
+      <inertia ixx="0.00015" ixy="0" ixz="0" iyy="0.00015" iyz="0" izz="0.00015"/>
+    </inertial>
+    <visual>
+      <!--
+        R_z(+90 deg) aligns Bilek's local X-axis bore with J4's +Y axis.
+        The +7.5 mm X offset places that bore centre on the J4 origin.
+      -->
+      <origin xyz="0.0075 0 0" rpy="0 0 1.5707963"/>
+      <geometry><mesh filename="Bilek.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="wrist_orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0075 0 0" rpy="0 0 1.5707963"/>
+      <geometry><box size="0.043 0.040 0.025"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="J4_wrist_pitch" type="revolute">
+    <parent link="forearm_link"/>
+    <child link="wrist_link"/>
+    <origin xyz="0.140 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5708" upper="1.5708" effort="8" velocity="1.5"/>
+    <dynamics damping="0.12" friction="0.03"/>
+  </joint>
+
+  <link name="gripper_base_link">
+    <inertial>
+      <origin xyz="0.0305 0 0" rpy="0 0 0"/>
+      <mass value="0.20"/>
+      <inertia ixx="0.00020" ixy="0" ixz="0" iyy="0.00030" iyz="0" izz="0.00030"/>
+    </inertial>
+    <visual name="el_visual">
+      <!-- Native El coordinates already use XY as the gripper plane. -->
+      <origin xyz="0.025 0 0.007" rpy="0 0 0"/>
+      <geometry><mesh filename="El.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="wrist_orange"/>
+    </visual>
+    <visual name="el_ust_visual">
+      <!-- Shift the child assembly so its two-finger grasp midpoint is on J5. -->
+      <origin xyz="0.025 0 -0.008" rpy="0 0 0"/>
+      <geometry><mesh filename="El_Ust.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="wrist_orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0.025 0 -0.0005" rpy="0 0 0"/>
+      <geometry><box size="0.050 0.0483 0.018"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="J5_wrist_roll" type="revolute">
+    <parent link="wrist_link"/>
+    <child link="gripper_base_link"/>
+    <!--
+      Bilek's gripper-side mounting face is at wrist X=27.5 mm.
+      Y=0 follows the centred servo opening; Z=0 is the project-owner
+      selected vertical placement.
+    -->
+    <origin xyz="0.0275 0 0" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.14159" upper="3.14159" effort="6" velocity="2.0"/>
+    <dynamics damping="0.10" friction="0.02"/>
+  </joint>
+
+  <!--
+    Fixed grasp reference:
+    - Parmak_2 nominal bend centre in its STL frame: (30, 0, 2.5) mm.
+    - Parmak_2 is collinear with Parmak_Disli at the mounting section.
+    - Bare projected Parmak_2 outlines first touch at
+      J6=0.317772514 rad (18.207052 deg).
+    - Before child-assembly placement, the two bend-centre layers are at
+      Z=10.6 mm and Z=5.4 mm; their midpoint is Z=8.0 mm.
+    - The child assembly is shifted by -8 mm, so the midpoint at the
+      closing pose is (93.258628, 0, 0) mm in gripper_base_link and lies
+      on the J5 roll axis.
+    This is a fixed nominal mesh reference. Tape thickness, printed-part
+    tolerance and servo backlash still require a physical TCP calibration.
+  -->
+  <link name="grasp_tcp_link"/>
+
+  <joint name="grasp_tcp_fixed" type="fixed">
+    <parent link="gripper_base_link"/>
+    <child link="grasp_tcp_link"/>
+    <origin xyz="0.093258628 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="left_finger_link">
+    <inertial>
+      <origin xyz="0.010 0 0" rpy="0 0 0"/>
+      <mass value="0.05"/>
+      <inertia ixx="0.00005" ixy="0" ixz="0" iyy="0.00005" iyz="0" izz="0.00002"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.002" rpy="0 0 0"/>
+      <geometry><mesh filename="Parmak_Disli_X_2.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="wrist_orange"/>
+    </visual>
+    <visual name="left_parmak_extension_visual">
+      <!-- Parmak_Disli edge hole x=20 mm coincides with Parmak_2 edge hole x=0 mm. -->
+      <origin xyz="0.020 0 0.0021" rpy="0 0 0"/>
+      <geometry><mesh filename="Parmak_2_X_2.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="wrist_orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0.008 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.034 0.018 0.012"/></geometry>
+    </collision>
+    <collision name="left_parmak_extension_collision">
+      <origin xyz="0.044940 0.008107 0.0046" rpy="0 0 0"/>
+      <geometry><box size="0.059861 0.026214 0.005"/></geometry>
+    </collision>
+  </link>
+
+  <link name="right_finger_link">
+    <inertial>
+      <origin xyz="0.010 0 0" rpy="0 0 0"/>
+      <mass value="0.05"/>
+      <inertia ixx="0.00005" ixy="0" ixz="0" iyy="0.00005" iyz="0" izz="0.00002"/>
+    </inertial>
+    <visual>
+      <!-- Extruded mesh is symmetric in Z; R_x(pi) mirrors it across XZ. -->
+      <origin xyz="0 0 0.002" rpy="3.14159265 0 0"/>
+      <geometry><mesh filename="Parmak_Disli_X_2.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="wrist_orange"/>
+    </visual>
+    <visual name="right_parmak_extension_visual">
+      <!-- Use the same transform and mirror convention as the right geared finger. -->
+      <origin xyz="0.020 0 0.0019" rpy="3.14159265 0 0"/>
+      <geometry><mesh filename="Parmak_2_X_2.stl" scale="0.001 0.001 0.001"/></geometry>
+      <material name="wrist_orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0.008 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.034 0.018 0.012"/></geometry>
+    </collision>
+    <collision name="right_parmak_extension_collision">
+      <origin xyz="0.044940 -0.008107 -0.0006" rpy="3.14159265 0 0"/>
+      <geometry><box size="0.059861 0.026214 0.005"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="J6_gripper" type="revolute">
+    <parent link="gripper_base_link"/>
+    <child link="left_finger_link"/>
+    <!-- El hole: plate-local (19.314,-8) mm plus 25 mm X mounting offset. -->
+    <origin xyz="0.044314 -0.008 -0.002" rpy="0 0 -0.52359878"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-0.60" upper="0.26" effort="4" velocity="2.0"/>
+    <dynamics damping="0.08" friction="0.02"/>
+  </joint>
+
+  <joint name="J6_gripper_mimic" type="revolute">
+    <parent link="gripper_base_link"/>
+    <child link="right_finger_link"/>
+    <origin xyz="0.044314 0.008 -0.002" rpy="0 0 0.52359878"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-0.60" upper="0.60" effort="4" velocity="2.0"/>
+    <dynamics damping="0.08" friction="0.02"/>
+    <mimic joint="J6_gripper" multiplier="-1.0" offset="0.0"/>
+  </joint>
+
+</robot>

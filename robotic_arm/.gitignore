@@ -1,0 +1,33 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.log
+.env*
+
+# Machine-specific calibration and captured images
+calibration/data/
+calibration/output/
+vision/captures/
+vision/validation/
+
+# Downloaded model weights and archived experiments
+vision/models/
+vision/archive/
+*.pt
+
+# Generated control artifacts
+control/artifacts/
+
+# Local web dependencies and build outputs
+robotic_arm_console/node_modules/
+robotic_arm_console/.next/
+robotic_arm_console/out/
+robotic_arm_console/dist/
+robotic_arm_console/.vinext/
+robotic_arm_console/.wrangler/
+
+# Downloaded MakerWorld mesh files are kept local.
+roboticArm/
+*.stl
+*.usd
+*.usda

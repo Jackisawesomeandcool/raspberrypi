@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "notes": [
+    "Example only. Confirm every command against the physical arm before using --send.",
+    "The arm must already be at reference_control_deg when the run starts.",
+    "J1 and J6 stay fixed; J5 is not part of the UDP payload and must remain at q5=0."
+  ],
+  "reference_control_deg": [90, 60, 90, 80, 150],
+  "settle_seconds": 3.0,
+  "max_speed_deg_s": 3.0,
+  "rate_hz": 10.0,
+  "camera_warmup_seconds": 2.0,
+  "capture_timeout_seconds": 10.0,
+  "sweeps": {
+    "J2": {
+      "fit": [50, 55, 60, 65, 70],
+      "validation": [57, 63]
+    },
+    "J3": {
+      "fit": [80, 85, 90, 95, 100],
+      "validation": [87, 93]
+    },
+    "J4": {
+      "fit": [70, 75, 80, 85, 90],
+      "validation": [77, 83]
+    }
+  }
+}
