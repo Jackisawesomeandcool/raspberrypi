@@ -80,7 +80,7 @@ JOINTS = [
     {"name": "shoulder",     "min": 20,  "max": 100, "centerable": True},
     {"name": "elbow",        "min": 0,   "max": 140, "centerable": True},
     {"name": "wrist_updown", "min": 0,   "max": 180, "centerable": True},
-    {"name": "claw",         "min": 115, "max": 150, "centerable": False},
+    {"name": "claw",         "min": 100, "max": 170, "home": 120, "centerable": False},
 ]
 
 JOINT_INDEX = {j["name"]: i for i, j in enumerate(JOINTS)}
@@ -107,7 +107,7 @@ PINCH_OPEN = 2.0
 # on top of whatever you're already commanding by hand/pinch. Tune the
 # gains by feel, or set ENABLED = False any time it fights with manual
 # control.
-GROUND_AVOIDANCE_ENABLED = True
+GROUND_AVOIDANCE_ENABLED = False
 ELBOW_COMPENSATION_GAIN = 0.6  # deg ADDED to elbow per deg shoulder drops (higher elbow = raise, so += lifts it)
 WRIST_COMPENSATION_GAIN = 0.3  # deg SUBTRACTED from wrist_updown per deg shoulder drops (wrist is inverted: lower = raise, so -= lifts it)
 
@@ -136,7 +136,7 @@ ARM_JOINT_RANGE = (0, 3)    # base, shoulder, elbow
 CLAW_JOINT_RANGE = (3, 5)   # wrist_updown, claw
 
 INVERT_BASE = False
-INVERT_SHOULDER = False
+INVERT_SHOULDER = True
 INVERT_ELBOW = False
 INVERT_WRIST_UPDOWN = False
 # ---------------------------------------------------------------------------

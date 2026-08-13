@@ -42,10 +42,10 @@ STEP = 5                   # degrees nudged per tick
 #   claw:         higher = open,        lower = closed (pincers touch at 115)
 JOINTS = [
     {"name": "base",         "min": 10,  "max": 190, "home": 90,  "centerable": True},
-    {"name": "shoulder",     "min": 30,  "max": 100, "home": 90,  "centerable": True},
-    {"name": "elbow",        "min": 0,   "max": 160, "home": 90,  "centerable": True},
+    {"name": "shoulder",     "min": 0,  "max": 180, "home": 90,  "centerable": True},
+    {"name": "elbow",        "min": 0,   "max": 180, "home": 90,  "centerable": True},
     {"name": "wrist_updown", "min": 0,   "max": 180, "home": 90,  "centerable": True},
-    {"name": "claw",         "min": 115, "max": 150, "home": 120, "centerable": False},
+    {"name": "claw",         "min": 100, "max": 170, "home": 120, "centerable": False},
 ]
 
 # Each held-key command nudges one or more joints by +/-STEP per tick
@@ -75,7 +75,7 @@ CONTROLS = {
 # direction as shoulder since wrist_updown's convention is inverted
 # (higher = lower wrist). Set False, or dial the gains down, if it fights
 # manual control.
-GROUND_AVOIDANCE_ENABLED = True
+GROUND_AVOIDANCE_ENABLED = False
 ELBOW_COMPENSATION_GAIN = 0.5
 WRIST_COMPENSATION_GAIN = 0.5
 
